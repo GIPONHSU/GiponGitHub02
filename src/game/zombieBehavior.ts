@@ -126,6 +126,16 @@ export function updateZombies(this: GameEngine, dt: number, zombieTargets: Top[]
             }
 
             // Update Boss dying sequence
+            if (z.type === 'zombie_small' && (z as any).isDying) {
+                z.vx = 0;
+                z.vy = 0;
+                (z as any).dyingTimer -= dt;
+                if ((z as any).dyingTimer <= 0) {
+                    z.markForDeletion = true;
+                }
+                return;
+            }
+
             if (z.type === 'zombie_boss' && (z as any).isDying) {
                 z.vx = 0;
                 z.vy = 0;
@@ -200,6 +210,12 @@ export function updateZombies(this: GameEngine, dt: number, zombieTargets: Top[]
 
             // 1. Process death check first
             if (z.hp <= 0 && !z.markForDeletion && !(z as any).isDying) {
+                if (z.type === 'zombie_small') {
+                    (z as any).isDying = true;
+                    (z as any).dyingTimer = 0.6; // ~20 frames at 30fps
+                    SoundSystem.play('Attack_Slash_020');
+                    return;
+                }
                 SoundSystem.play('Attack_Slash_020');
                 z.markForDeletion = true;
                 const isBoss = (z.type as string) === 'zombie_boss';

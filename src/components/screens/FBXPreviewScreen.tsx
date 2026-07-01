@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { TGALoader } from 'three/examples/jsm/loaders/TGALoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SoundSystem } from '../../game/systems/SoundSystem';
 
@@ -130,14 +131,66 @@ export default function FBXPreviewScreen({ onBack }: FBXPreviewScreenProps) {
           }
         });
 
+        // Apply texture specifically for M_ZombieMan.fbx
+        if (selectedFile === 'M_ZombieMan.fbx') {
+          const tgaLoader = new TGALoader();
+          tgaLoader.load('/Textures/T_ZombieMan_D.tga', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
         // Center and scale a bit if needed
         object.position.set(0, 0, 0);
         modelRef.current = object;
         sceneRef.current?.add(object);
 
         if (object.animations && object.animations.length > 0) {
-          animsRef.current = object.animations;
-          setAnimations(object.animations.map(a => a.name || 'Unnamed Animation'));
+          let animationsToUse = object.animations;
+
+          // Splice animation clips for M_ZombieMan.fbx based on frame ranges
+          if (selectedFile === 'M_ZombieMan.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 10, 55, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_S', 70, 85, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_L', 85, 100, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_E', 100, 115, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump', 70, 115, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 185, 205, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_S', 230, 255, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_E', 255, 265, fps),
+            ];
+          }
+
+          animsRef.current = animationsToUse;
+          setAnimations(animationsToUse.map(a => a.name || 'Unnamed Animation'));
           mixerRef.current = new THREE.AnimationMixer(object);
           setCurrentAnimIndex(0);
         } else {

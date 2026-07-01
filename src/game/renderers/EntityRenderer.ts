@@ -1,5 +1,6 @@
 import * as GameUtils from '../systems/GameUtils';
 import type { GameEngine } from '../GameEngine';
+import { zombie3D } from './Zombie3DRenderer';
 import { drawCapsulePath } from './Utils';
 import { CANVAS_W, CANVAS_H, MAX_SPIN } from '../constants';
 import { Top, Zombie, Obstacle, Item, Particle, Entity, ConcreteBlock, Afterimage, PlayerStats, Projectile, PhantomClone } from '../types';
@@ -1087,7 +1088,28 @@ export function drawEntities(ctx: CanvasRenderingContext2D, engine: GameEngine, 
     ctx.globalCompositeOperation = "lighter";
     ctx.globalAlpha = 0.6;
             }
-            ctx.drawImage(spr, -spr.width/2, -spr.height/2);
+            if (z.type === 'zombie_small' && zombie3D.isLoaded) {
+                const isDead = (z as any).isDying === true;
+                let seed = 0;
+                for (let i = 0; i < z.id.length; i++) seed += z.id.charCodeAt(i);
+                
+                let animTime = (Date.now() / 1000) + (seed % 10);
+                if (isDead) {
+                    // dyingTimer starts at 0.6 and goes down
+                    animTime = 0.6 - ((z as any).dyingTimer || 0);
+                }
+                
+                // Get the frame
+                const dom = zombie3D.getFrame(isDead, animTime);
+                if (dom) {
+                    const drawSize = 160;
+                    ctx.drawImage(dom, -drawSize/2, -drawSize/2, drawSize, drawSize);
+                } else {
+                    ctx.drawImage(spr, -spr.width/2, -spr.height/2);
+                }
+            } else {
+                ctx.drawImage(spr, -spr.width/2, -spr.height/2);
+            }
             ctx.restore();
             
             // Floating "20彩票" ticket icon for purple/brown/pink/golden zombies
