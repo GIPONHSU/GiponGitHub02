@@ -74,8 +74,8 @@ export function updateBasicZombie(engine: GameEngine, z: Zombie, dt: number, zom
                 z.vx = (targetX - z.x) * 5.0; // Spring logic
                 z.vy = (targetY - z.y) * 5.0;
                 
-                // Always face outwards
-                z.angle = currentOffset + Math.PI/2;
+                // Always face same direction as Golden Zombie
+                z.angle = targetGolden.angle;
             } else {
                 // Golden zombie died, orbiting zombies should die too (handled in death logic), but just in case:
                 z.hp = 0;

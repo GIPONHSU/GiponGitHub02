@@ -282,39 +282,43 @@ export function updateProjectiles(engine: GameEngine, dt: number) {
                 addParticles(engine, z.x, z.y, '#ffffff', 4, 140, 2);
 
                 if (z.hp <= 0) {
-                    if (!GameUtils.handleZombieDeath(engine, z, proj.ownerId)) return;
-                    z.markForDeletion = true;
-                    spawnSkillKillExplosion(engine, z.x, z.y, z.type === 'zombie_boss');
-                    const points = z.type === 'zombie_boss' ? 500 : (isBig ? 50 : 10);
-                    
-                    const ownerMatch = proj.ownerId.match(/\d+/);
-                    const ownerIdx = ownerMatch ? parseInt(ownerMatch[0], 10) : 0;
-                    engine.addScore(ownerIdx, points);
-                    
-                    engine.spawnTicket(z.x, z.y, z.type, ownerIdx);
+                    const isAlreadyDying = (z as any).isDying;
+                    if (!isAlreadyDying) {
+                        spawnSkillKillExplosion(engine, z.x, z.y, z.type === 'zombie_boss');
+                        const points = z.type === 'zombie_boss' ? 500 : (isBig ? 50 : 10);
+                        
+                        const ownerMatch = proj.ownerId.match(/\d+/);
+                        const ownerIdx = ownerMatch ? parseInt(ownerMatch[0], 10) : 0;
+                        engine.addScore(ownerIdx, points);
+                        
+                        engine.spawnTicket(z.x, z.y, z.type, ownerIdx);
 
-                    const ownerTop = engine.tops.find(t => t.id === proj.ownerId);
-                    if (ownerTop) {
-                        ownerTop.kills = (ownerTop.kills ?? 0) + 1;
+                        const ownerTop = engine.tops.find(t => t.id === proj.ownerId);
+                        if (ownerTop) {
+                            ownerTop.kills = (ownerTop.kills ?? 0) + 1;
+                        }
+
+                        // Play explosion shockwave
+                        let selectCol = '#22c55e';
+                        if (z.type === 'zombie_boss') selectCol = '#ea580c';
+                        else if (z.type === 'zombie_big') selectCol = '#9333ea';
+                        else if (z.type === 'zombie_bomb') selectCol = '#f97316';
+                        
+                        engine.shockwaves.push({
+                            x: z.x,
+                            y: z.y,
+                            radius: 0,
+                            maxRadius: z.type === 'zombie_boss' ? 450 : (isBig ? 250 : 150),
+                            speed: z.type === 'zombie_boss' ? 800 : (isBig ? 600 : 500),
+                            color: selectCol,
+                            thickness: z.type === 'zombie_boss' ? 20 : (isBig ? 12 : 8),
+                            life: z.type === 'zombie_boss' ? 0.6 : 0.4,
+                            maxLife: z.type === 'zombie_boss' ? 0.6 : 0.4
+                        });
                     }
 
-                    // Play explosion shockwave
-                    let selectCol = '#22c55e';
-                    if (z.type === 'zombie_boss') selectCol = '#ea580c';
-                    else if (z.type === 'zombie_big') selectCol = '#9333ea';
-                    else if (z.type === 'zombie_bomb') selectCol = '#f97316';
-                    
-                    engine.shockwaves.push({
-                        x: z.x,
-                        y: z.y,
-                        radius: 0,
-                        maxRadius: z.type === 'zombie_boss' ? 450 : (isBig ? 250 : 150),
-                        speed: z.type === 'zombie_boss' ? 800 : (isBig ? 600 : 500),
-                        color: selectCol,
-                        thickness: z.type === 'zombie_boss' ? 20 : (isBig ? 12 : 8),
-                        life: z.type === 'zombie_boss' ? 0.6 : 0.4,
-                        maxLife: z.type === 'zombie_boss' ? 0.6 : 0.4
-                    });
+                    if (!GameUtils.handleZombieDeath(engine, z, proj.ownerId)) return;
+                    z.markForDeletion = true;
                 }
             }
         });

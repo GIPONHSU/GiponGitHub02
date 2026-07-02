@@ -62,7 +62,6 @@ export function updateBlackZombie(engine: GameEngine, black: Zombie, dt: number,
             black.markForDeletion = true;
             const match = bz.lastKillerId ? bz.lastKillerId.match(/\d+/) : null;
             const idx = match ? parseInt(match[0], 10) : 0;
-            engine.spawnTicket(black.x, black.y, black.type, idx);
             
             EffectSystem.addParticles(engine, black.x, black.y, '#374151', 35, 300, 10);
             EffectSystem.addParticles(engine, black.x, black.y, '#111827', 15, 200, 6);

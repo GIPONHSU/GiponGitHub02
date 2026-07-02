@@ -198,6 +198,8 @@ export interface Zombie extends Entity {
     hitCounts?: Map<string, number>;
     orbitTargetId?: string;
     orbitAngleOffset?: number;
+    fbxModel?: 'man' | 'girl' | 'bombman' | 'dog' | 'mummy' | 'football';
+    attackTimer?: number;
 }
 
 export interface Obstacle extends Entity {

@@ -8,7 +8,13 @@ import { SoundSystem } from '../../game/systems/SoundSystem';
 // For now, we manually list the known FBX files. 
 // If more are added, they can be added to this list.
 const FBX_FILES = [
-  'M_ZombieMan.fbx'
+  'M_ZombieMan.fbx',
+  'M_ZombieGirl.fbx',
+  'ChampionChef_Skin.fbx',
+  'BombMan_Skin.fbx',
+  'Mummy_Ani.fbx',
+  'FootballPlayer_Skin.fbx',
+  'M_ZombieDog.fbx'
 ];
 
 interface FBXPreviewScreenProps {
@@ -45,7 +51,7 @@ export default function FBXPreviewScreen({ onBack }: FBXPreviewScreenProps) {
     scene.background = new THREE.Color(0x1a1a2e);
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
     camera.position.set(0, 150, 300);
     cameraRef.current = camera;
 
@@ -165,6 +171,217 @@ export default function FBXPreviewScreen({ onBack }: FBXPreviewScreenProps) {
           });
         }
 
+        // Apply texture specifically for ChampionChef_Skin.fbx
+        if (selectedFile === 'ChampionChef_Skin.fbx') {
+          const tgaLoader = new TGALoader();
+          tgaLoader.load('/Textures/T_Champion_Chef_D.tga', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.SkinnedMesh).isSkinnedMesh) {
+                (child as THREE.SkinnedMesh).normalizeSkinWeights();
+              }
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhongMaterial || mat instanceof THREE.MeshBasicMaterial) {
+                      mat.map = texture;
+                      mat.needsUpdate = true;
+                    }
+                  });
+                } else {
+                  if (mesh.material instanceof THREE.MeshStandardMaterial || mesh.material instanceof THREE.MeshPhongMaterial || mesh.material instanceof THREE.MeshBasicMaterial) {
+                    mesh.material.map = texture;
+                    mesh.material.needsUpdate = true;
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Apply texture specifically for BombMan_Skin.fbx
+        if (selectedFile === 'BombMan_Skin.fbx') {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load('/Textures/T_Bombman_Diffuse.png', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Apply texture specifically for Mummy_Ani.fbx
+        if (selectedFile === 'Mummy_Ani.fbx') {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load('/Textures/T_Mummy_Diffuse.png', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Apply texture specifically for FootballPlayer_Skin.fbx
+        if (selectedFile === 'FootballPlayer_Skin.fbx') {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load('/Textures/T_Football_player_D.png', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Apply texture specifically for M_ZombieDog.fbx
+        if (selectedFile === 'M_ZombieDog.fbx') {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load('/Textures/T_ZombieDog_diffuse_A.jpg', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      (mat as any).emissiveMap = texture;
+                      (mat as any).emissive = new THREE.Color(0xffffff);
+                      (mat as any).emissiveIntensity = 0.5;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                        emissiveMap: texture,
+                        emissive: 0xffffff,
+                        emissiveIntensity: 0.5,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    (mesh.material as any).emissiveMap = texture;
+                    (mesh.material as any).emissive = new THREE.Color(0xffffff);
+                    (mesh.material as any).emissiveIntensity = 0.5;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                      emissiveMap: texture,
+                      emissive: 0xffffff,
+                      emissiveIntensity: 0.5,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Apply texture specifically for M_ZombieGirl.fbx
+        if (selectedFile === 'M_ZombieGirl.fbx') {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load('/Textures/T_ZombieGirl_Diffuse.png', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            object.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (Array.isArray(mesh.material)) {
+                  mesh.material.forEach(mat => {
+                    if ('map' in mat) {
+                      (mat as any).map = texture;
+                      mat.needsUpdate = true;
+                    } else {
+                      mesh.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                      });
+                    }
+                  });
+                } else {
+                  if (mesh.material && 'map' in mesh.material) {
+                    (mesh.material as any).map = texture;
+                    mesh.material.needsUpdate = true;
+                  } else {
+                    mesh.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                    });
+                  }
+                }
+              }
+            });
+          });
+        }
+
         // Center and scale a bit if needed
         object.position.set(0, 0, 0);
         modelRef.current = object;
@@ -186,6 +403,113 @@ export default function FBXPreviewScreen({ onBack }: FBXPreviewScreenProps) {
               THREE.AnimationUtils.subclip(baseClip, 'Dead', 185, 205, fps),
               THREE.AnimationUtils.subclip(baseClip, 'Attack_S', 230, 255, fps),
               THREE.AnimationUtils.subclip(baseClip, 'Attack_E', 255, 265, fps),
+            ];
+          } else if (selectedFile === 'M_ZombieGirl.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 90, 130, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_S', 10, 25, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_L', 25, 40, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_E', 40, 60, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump', 10, 60, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 140, 161, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_S', 190, 215, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_E', 215, 225, fps),
+            ];
+          } else if (selectedFile === 'ChampionChef_Skin.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 10, 30, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump', 40, 85, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_H', 100, 125, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead02', 140, 190, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_L', 200, 215, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_S', 40, 55, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_L', 55, 70, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_E', 70, 85, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hurt', 100, 125, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 140, 165, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'AwakeAnnouncement', 100, 130, fps),
+            ];
+          } else if (selectedFile === 'BombMan_Skin.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 10, 30, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead02', 50, 90, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hurt01', 100, 198, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead01', 225, 250, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hurt02', 270, 285, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt', 272, 285, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Fall', 206, 209, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'AwakeAnnouncement', 100, 191, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack', 50, 90, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt_S', 272, 278, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt_E', 278, 285, fps),
+            ];
+          } else if (selectedFile === 'Mummy_Ani.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 10, 124, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_H', 150, 195, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 779, 859, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Walk02', 433, 513, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Idle02', 535, 593, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Idle01', 615, 665, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Awake', 675, 775, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Skill', 865, 935, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Angry', 987, 1069, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Debut', 987, 1085, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Skill02', 872, 960, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Awake02', 707, 775, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead02', 785, 859, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_S', 1160, 1200, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Jump_E', 1200, 1265, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Fly_S', 1265, 1330, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'FlyThrow', 1331, 1410, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'FlyAtk', 1420, 1490, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Fly_L', 1500, 1575, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'FlyAway', 1600, 1635, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'FlyDead', 1650, 1722, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Explode', 1730, 1800, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Skill03', 1830, 1945, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'FlyAngry', 1960, 2030, fps),
+            ];
+          } else if (selectedFile === 'FootballPlayer_Skin.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 220, 280, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Run', 110, 120, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'TouchDown', 150, 180, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_L', 430, 445, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_H', 300, 331, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_RD', 194, 195, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_LU', 202, 203, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_LD', 198, 199, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'HeadAttack', 380, 405, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'HandAttack', 360, 380, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 407, 425, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'AwakeAnnouncement', 300, 330, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_S', 350, 360, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_L', 360, 360, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt', 435, 445, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hurt', 300, 331, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Hit_RU', 190, 191, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt_E', 440, 445, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'ShortHurt_S', 433, 440, fps),
+            ];
+          } else if (selectedFile === 'M_ZombieDog.fbx') {
+            const baseClip = object.animations[0];
+            const fps = 30; // Assuming 30 fps
+            animationsToUse = [
+              THREE.AnimationUtils.subclip(baseClip, 'Walk', 10, 22, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Dead', 30, 48, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_S', 75, 100, fps),
+              THREE.AnimationUtils.subclip(baseClip, 'Attack_E', 100, 110, fps),
             ];
           }
 

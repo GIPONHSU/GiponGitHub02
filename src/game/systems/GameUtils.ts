@@ -193,11 +193,14 @@ export function handleZombieDeath(engine: GameEngine, z: import('../types').Zomb
     if (z.type !== 'zombie_boss') {
         handleZombieKillForMissions(engine, killerId, z.type);
     }
-    if ((z.type === 'zombie_big' || z.type === 'zombie_bomb' || z.type === 'zombie_bouncing' || z.type === 'zombie_golden' || z.type === 'zombie_black') && !(z as any).isDying) {
+    if ((z.type === 'zombie_small' || z.type === 'zombie_big' || z.type === 'zombie_bomb' || z.type === 'zombie_bouncing' || z.type === 'zombie_golden' || z.type === 'zombie_black') && !(z as any).isDying) {
         (z as any).isDying = true;
-        (z as any).dyingTimer = 1.25;
+        (z as any).dyingTimer = z.type === 'zombie_small' ? 0.3 : 1.25;
         (z as any).lastKillerId = killerId;
         z.hp = 0;
+        if (z.type === 'zombie_small') {
+            SoundSystem.play('Attack_Slash_020');
+        }
         return false;
     }
     return true;

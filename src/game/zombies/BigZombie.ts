@@ -142,7 +142,6 @@ export function updateBigZombie(engine: GameEngine, z: Zombie, dt: number, zombi
                 big.markForDeletion = true;
                 const match = big.lastKillerId ? big.lastKillerId.match(/\d+/) : null;
                 const idx = match ? parseInt(match[0], 10) : 0;
-                engine.spawnTicket(big.x, big.y, big.type, idx);
                 
                 EffectSystem.addParticles(engine, big.x, big.y, '#9333ea', 35, 300, 10);
                 EffectSystem.addParticles(engine, big.x, big.y, '#6b21a8', 15, 200, 6);

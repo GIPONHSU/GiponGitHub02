@@ -206,6 +206,7 @@ export class GameEngine {
         window.removeEventListener('keydown', (this as any).handleKeyDownBound as any);
         window.removeEventListener('keyup', (this as any).handleKeyUpBound as any);
         cancelAnimationFrame(this.rafId);
+        SoundSystem.stopAll();
     }
 
     initGame(joinedFlags: boolean[]) {
@@ -1752,26 +1753,29 @@ export class GameEngine {
                         EffectSystem.addParticles(this, z.x, z.y, '#ffffff', 2, 150, 2);
 
                         if (z.hp <= 0) {
+                            const isAlreadyDying = (z as any).isDying;
+                            if (!isAlreadyDying) {
+                                EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
+                                this.spawnTicket(z.x, z.y, z.type, pc.originalIdx);
+                                const owner = this.tops.find(t => t.id === pc.ownerId);
+                                if (owner) {
+                                    owner.kills = (owner.kills ?? 0) + 1;
+                                }
+
+                                this.shockwaves.push({
+                                    x: z.x,
+                                    y: z.y,
+                                    radius: 0,
+                                    maxRadius: isBoss ? 450 : (isBig ? 250 : 150),
+                                    speed: isBoss ? 800 : (isBig ? 600 : 500),
+                                    color: mainColor,
+                                    thickness: isBoss ? 20 : (isBig ? 12 : 8),
+                                    life: isBoss ? 0.6 : 0.4,
+                                    maxLife: isBoss ? 0.6 : 0.4
+                                });
+                            }
                             if (!GameUtils.handleZombieDeath(this, z, pc.ownerId)) return;
                             z.markForDeletion = true;
-                            EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
-                            this.spawnTicket(z.x, z.y, z.type, pc.originalIdx);
-                            const owner = this.tops.find(t => t.id === pc.ownerId);
-                            if (owner) {
-                                owner.kills = (owner.kills ?? 0) + 1;
-                            }
-
-                            this.shockwaves.push({
-                                x: z.x,
-                                y: z.y,
-                                radius: 0,
-                                maxRadius: isBoss ? 450 : (isBig ? 250 : 150),
-                                speed: isBoss ? 800 : (isBig ? 600 : 500),
-                                color: mainColor,
-                                thickness: isBoss ? 20 : (isBig ? 12 : 8),
-                                life: isBoss ? 0.6 : 0.4,
-                                maxLife: isBoss ? 0.6 : 0.4
-                            });
                         }
                     }
                 }
@@ -2710,26 +2714,29 @@ export class GameEngine {
                             EffectSystem.addParticles(this, z.x, z.y, '#38bdf8', 2, 130, 2);
 
                             if (z.hp <= 0) {
+                                const isAlreadyDying = (z as any).isDying;
+                                if (!isAlreadyDying) {
+                                    EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
+                                    const matchIdx = top.id.match(/\d+/);
+                                    const playerIdx = matchIdx ? parseInt(matchIdx[0], 10) : 0;
+                                    this.spawnTicket(z.x, z.y, z.type, playerIdx);
+                                    top.kills = (top.kills ?? 0) + 1;
+
+                                    // Small flashy energy wave
+                                    this.shockwaves.push({
+                                        x: z.x,
+                                        y: z.y,
+                                        radius: 0,
+                                        maxRadius: z.type === 'zombie_boss' ? 400 : 120,
+                                        speed: 450,
+                                        color: '#eab308',
+                                        thickness: 6,
+                                        life: 0.35,
+                                        maxLife: 0.35
+                                    });
+                                }
                                 if (!GameUtils.handleZombieDeath(this, z, top.id)) return;
                                 z.markForDeletion = true;
-                                EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
-                                const matchIdx = top.id.match(/\d+/);
-                                const playerIdx = matchIdx ? parseInt(matchIdx[0], 10) : 0;
-                                this.spawnTicket(z.x, z.y, z.type, playerIdx);
-                                top.kills = (top.kills ?? 0) + 1;
-
-                                // Small flashy energy wave
-                                this.shockwaves.push({
-                                    x: z.x,
-                                    y: z.y,
-                                    radius: 0,
-                                    maxRadius: z.type === 'zombie_boss' ? 400 : 120,
-                                    speed: 450,
-                                    color: '#eab308',
-                                    thickness: 6,
-                                    life: 0.35,
-                                    maxLife: 0.35
-                                });
                             }
                         }
                     }
@@ -3831,28 +3838,31 @@ export class GameEngine {
 
                         // 計算並處理殭屍死亡
                         if (z.hp <= 0) {
+                            const isAlreadyDying = (z as any).isDying;
+                            if (!isAlreadyDying) {
+                                EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
+                                const match = top.id.match(/\d+/);
+                                if (match) {
+                                    const idx = parseInt(match[0], 10);
+                                    this.spawnTicket(z.x, z.y, z.type, idx);
+                                }
+                                top.kills = (top.kills ?? 0) + 1;
+
+                                // 觸發殭屍死亡時的擴大膨脹衝擊波
+                                this.shockwaves.push({
+                                    x: z.x,
+                                    y: z.y,
+                                    radius: 0,
+                                    maxRadius: isBoss ? 450 : (isBig ? 250 : 150),
+                                    speed: isBoss ? 800 : (isBig ? 600 : 500),
+                                    color: mainColor,
+                                    thickness: isBoss ? 20 : (isBig ? 12 : 8),
+                                    life: isBoss ? 0.6 : 0.4,
+                                    maxLife: isBoss ? 0.6 : 0.4
+                                });
+                            }
                             if (!GameUtils.handleZombieDeath(this, z, top.id)) return;
                             z.markForDeletion = true;
-                            EffectSystem.spawnSkillKillExplosion(this, z.x, z.y, z.type === 'zombie_boss');
-                            const match = top.id.match(/\d+/);
-                            if (match) {
-                                const idx = parseInt(match[0], 10);
-                                this.spawnTicket(z.x, z.y, z.type, idx);
-                            }
-                            top.kills = (top.kills ?? 0) + 1;
-
-                            // 觸發殭屍死亡時的擴大膨脹衝擊波
-                            this.shockwaves.push({
-                                x: z.x,
-                                y: z.y,
-                                radius: 0,
-                                maxRadius: isBoss ? 450 : (isBig ? 250 : 150),
-                                speed: isBoss ? 800 : (isBig ? 600 : 500),
-                                color: mainColor,
-                                thickness: isBoss ? 20 : (isBig ? 12 : 8),
-                                life: isBoss ? 0.6 : 0.4,
-                                maxLife: isBoss ? 0.6 : 0.4
-                            });
                         }
                     }
                 }

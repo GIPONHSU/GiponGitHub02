@@ -144,7 +144,6 @@ export function updateBouncingZombie(engine: GameEngine, z: Zombie, dt: number, 
                 big.markForDeletion = true;
                 const match = big.lastKillerId ? big.lastKillerId.match(/\d+/) : null;
                 const idx = match ? parseInt(match[0], 10) : 0;
-                engine.spawnTicket(big.x, big.y, big.type, idx);
                 
                 EffectSystem.addParticles(engine, big.x, big.y, '#be185d', 45, 400, 12);
                 EffectSystem.addParticles(engine, big.x, big.y, '#f472b6', 25, 300, 8);

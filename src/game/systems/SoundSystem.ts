@@ -6,6 +6,8 @@ export class SoundSystem {
     private static orbitFadeInterval: number | null = null;
     private static isOrbiting: boolean = false;
 
+    private static activeSounds: HTMLAudioElement[] = [];
+
     static init() {
         if (this.initialized) return;
         this.initialized = true;
@@ -100,10 +102,38 @@ export class SoundSystem {
                 }
             }
 
+            clone.addEventListener('ended', () => {
+                const idx = this.activeSounds.indexOf(clone);
+                if (idx > -1) this.activeSounds.splice(idx, 1);
+            });
+            this.activeSounds.push(clone);
+
             clone.play().catch(e => {
                 console.warn(`SoundSystem: Failed to play ${name}:`, e);
+                const idx = this.activeSounds.indexOf(clone);
+                if (idx > -1) this.activeSounds.splice(idx, 1);
             });
         }
+    }
+
+    static stopAll() {
+        this.activeSounds.forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        this.activeSounds = [];
+
+        this.setOrbiting(false);
+        if (this.orbitAudio) {
+            this.orbitAudio.pause();
+            this.orbitAudio.currentTime = 0;
+            this.orbitAudio = null;
+        }
+        if (this.orbitFadeInterval !== null) {
+            clearInterval(this.orbitFadeInterval);
+            this.orbitFadeInterval = null;
+        }
+        this.isOrbiting = false;
     }
 
     static setOrbiting(orbiting: boolean) {

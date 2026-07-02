@@ -405,7 +405,7 @@ export function triggerZombieSiege(engine: GameEngine, overrideTargetPlayer?: To
             y: spawnY,
             vx: 0,
             vy: 0,
-            radius: 24,
+            radius: 14.4,
             mass: 8,
             markForDeletion: false,
             hp: 2,

@@ -39,6 +39,9 @@ export default function Arena({ players, modelTypes = [1, 2, 3, 4], gameMode, en
 
         return () => {
              if (engineRef.current) engineRef.current.destroy();
+             if (audioRef.current) {
+                 audioRef.current.pause();
+             }
         };
     }, []);
 

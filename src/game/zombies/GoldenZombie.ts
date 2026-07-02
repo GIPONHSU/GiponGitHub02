@@ -61,7 +61,6 @@ export function updateGoldenZombie(engine: GameEngine, z: Zombie, dt: number, zo
                 golden.markForDeletion = true;
                 const match = golden.lastKillerId ? golden.lastKillerId.match(/\d+/) : null;
                 const idx = match ? parseInt(match[0], 10) : 0;
-                engine.spawnTicket(golden.x, golden.y, golden.type, idx);
                 
                 EffectSystem.addParticles(engine, golden.x, golden.y, '#facc15', 35, 300, 10);
                 EffectSystem.addParticles(engine, golden.x, golden.y, '#ca8a04', 15, 200, 6);

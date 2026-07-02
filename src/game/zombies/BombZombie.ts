@@ -23,9 +23,9 @@ export function updateBombZombie(engine: GameEngine, z: Zombie, dt: number, zomb
             big.vx = 0;
             big.vy = 0;
             
-            // Spin only during the first 1 second (dyingTimer > 0.25)
+            // Stop spinning during death, just let the Dead02 animation play
             if (big.dyingTimer > 0.25) {
-                big.angle += 15 * dt; // spin fast
+                // big.angle += 15 * dt; // Removed to stop fast spinning
             }
             
             // Fire earthquake at exactly 0.25s remaining (only once)
@@ -142,7 +142,6 @@ export function updateBombZombie(engine: GameEngine, z: Zombie, dt: number, zomb
                 big.markForDeletion = true;
                 const match = big.lastKillerId ? big.lastKillerId.match(/\d+/) : null;
                 const idx = match ? parseInt(match[0], 10) : 0;
-                engine.spawnTicket(big.x, big.y, big.type, idx);
                 
                 EffectSystem.addParticles(engine, big.x, big.y, '#f97316', 35, 300, 10);
                 EffectSystem.addParticles(engine, big.x, big.y, '#78350f', 15, 200, 6);
